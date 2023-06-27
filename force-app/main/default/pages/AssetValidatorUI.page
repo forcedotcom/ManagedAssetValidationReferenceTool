@@ -1,0 +1,33 @@
+<apex:page controller="AssetValidator">
+
+<!-- Display an input field for the asset id -->
+    <apex:form >
+        <apex:pageBlock title="Check Asset data for compatibility with subsequent lifecycle operations constraints (Not exhaustive)">
+            <apex:inputText value="{!assetId}" html-placeholder="Enter Asset Id"/>
+            <apex:commandButton value="CPQ+ or Billing" action="{!validateAssetForCPQPlusOrBilling}" title="Validate CPQ+ or Billing Assets"/>
+            <apex:commandButton value="SubMgmt" action="{!validateAssetForSubMgmt}" title="Validate Subscription Management Assets"/>
+            <apex:commandButton value="SubMgmt Bundled Asset Structure" action="{!validateSubMgmtAssetBundleStructure}" title="Validate Subscription Management bundled Asset structure"/>
+        </apex:pageBlock>
+    </apex:form>
+<!-- Display the validation result as a csv -->
+<apex:outputPanel id="output">
+    <apex:pageMessages />
+    <apex:outputText rendered="{!NOT(errorMessages.empty)}">
+        <h1>Unsuccessful Validations</h1><br/>
+        <apex:repeat value="{!errorMessages}" var="error">
+            {!error}<br/><br/>
+        </apex:repeat>
+    </apex:outputText>
+    <apex:outputText rendered="{!NOT(successMessages.empty)}">
+        <h1>Successful Validations</h1><br/>
+        <apex:repeat value="{!successMessages}" var="success">
+            {!success}<br/><br/>
+        </apex:repeat>
+    </apex:outputText>
+</apex:outputPanel>
+    <style language="css">
+        input.btn {
+            margin: 0.3rem;
+        }
+    </style>  
+</apex:page>
