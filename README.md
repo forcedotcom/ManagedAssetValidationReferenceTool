@@ -1,6 +1,15 @@
 # LifecycleManagedAssetValidationReferenceTool
 
-This project is a reference implementation for validating lifecycle-managed assets modified by SObject APIs.
+This project is a reference implementation to validate that the data uploaded via SObject APIs for lifecycle-managed assets have the necessary information that’ll allow subsequent operations lifecycle operations against the asset.
+
+The following fields present on the UI to validate Assets and satellite entities
+1. AssetId : To validate your Asset, please enter one Asset ID at a time in this input field
+2. CPQ+ or Billing : The customers with CPQ+ or Billing licenses should use this button to validate lifecycle managed assets in their org
+3. SubMgmt : The customers with SubscriptionManagement licenses should use this button to validate lifecycle managed assets in their org
+4. SubMgmt Bundled Asset Structure: The customers with SubscriptionManagement licenses should use this button to validate the bundle relationship (i.e. only AssetRelationships) for given AssetId which could be a root or a child in a bundle.
+
+**Note**: While the project contains several validation checks, the validation checks in this reference implementation are not exhaustive. We strongly advise users to extensively test their Customer Asset Lifecycle Management integration in sandbox environments and ensure the operations execute as expected before moving them live in production. This project is not a replacement for a thorough testing process that the users should pursue.
+
 ## Salesforce DX Project: Next Steps
 
 Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
