@@ -189,14 +189,14 @@ public with sharing class AssetBundleValidatorUtil {
         processIdList(incorrectFromDate, 'FromDate');
 
         if (missingAssetRole.isEmpty() && missingRelatedRole.isEmpty() && missingProductRelationshipType.isEmpty() && incorrectFromDate.isEmpty()) {
-            ValidationResults.successMessages.add('All AssetRelationship field validations are successful');
+            ValidationResults.successMessages.add('All AssetRelationship field validations are successful.');
         }
 
         if (!multiplePrimaryRelationship.isEmpty()) {
             ValidationResults.errorMessages.add('The following assets have more than one primary asset: ' + multiplePrimaryRelationship + '. Only one primary relationship can exist for an asset');
         }
         else {
-            ValidationResults.successMessages.add('All AssetRelationship records contain one primary asset');
+            ValidationResults.successMessages.add('All AssetRelationship records contain one primary asset.');
         }
     }
 

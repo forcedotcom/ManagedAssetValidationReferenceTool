@@ -38,7 +38,7 @@ public with sharing class AssetValidatorUtil {
             errorResults.add('Set the Lifecycle-managed asset checkbox to true.');
         }
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('Assets fields are valid');
+            ValidationResults.successMessages.add('Assets fields are valid.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -77,7 +77,7 @@ public with sharing class AssetValidatorUtil {
             }
         }
         if (errorResult == null) {
-            ValidationResults.successMessages.add('Asset.currentLifecycleEndDate is valid');
+            ValidationResults.successMessages.add('Asset.currentLifecycleEndDate is valid.');
         } else {
             ValidationResults.errorMessages.add(errorResult);
         }
@@ -87,7 +87,7 @@ public with sharing class AssetValidatorUtil {
     public static void validateAssetActionsForCPQPlusOrBilling(List<AssetAction> assetActions) {
         List<String> errorResults = validateAAFields(assetActions);
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('The AssetActions are valid for given Asset Id');
+            ValidationResults.successMessages.add('The AssetActions are valid for given Asset Id.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -102,9 +102,9 @@ public with sharing class AssetValidatorUtil {
             }
         }
         if(assetActionSources.isEmpty()) {
-            ValidationResults.successMessages.add('No AssetActionSources available for this Asset');
+            ValidationResults.successMessages.add('No AssetActionSources available for this Asset.');
         } else if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('The AssetActionSources are valid for the given Asset Id');
+            ValidationResults.successMessages.add('The AssetActionSources are valid for the given Asset Id.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -131,7 +131,7 @@ public with sharing class AssetValidatorUtil {
             errorResults.add('AssetActionSource must have a valid ReferenceEntityItemId. Check the AssetActionSource Id(s):  ' + invalidReferenceEntityItemIds);
         }
         if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('The AssetActions and AssetActionSources are valid for the given Asset Id');
+            ValidationResults.successMessages.add('The AssetActions and AssetActionSources are valid for the given Asset Id.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -146,7 +146,7 @@ public with sharing class AssetValidatorUtil {
         if (totalAmountFromAA != Double.valueOf(asset.totalLifecycleAmount)) {
             ValidationResults.errorMessages.add('Asset.totalLifecycleAmount doesn\'t match the sum of all associated AssetAction for the asset Id: ' + asset.Id);
         } else {
-            ValidationResults.successMessages.add('Asset.totalLifecycleAmount is valid');
+            ValidationResults.successMessages.add('Asset.totalLifecycleAmount is valid.');
         }
     }
 
@@ -215,7 +215,7 @@ public with sharing class AssetValidatorUtil {
             previousASP = asp;
         }
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetstatePeriods does not have gaps or overlaps');
+            ValidationResults.successMessages.add('AssetstatePeriods does not have gaps or overlaps.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -230,7 +230,7 @@ public with sharing class AssetValidatorUtil {
         // Validate LifecycleStartDate
         if(lifecycleStartDate != null) {
             if (lifecycleStartDate != actualStartDate) {
-                errorResults.add('lifecycleStartDate does not match with startDate of the first AssetStatePeriod.');
+                errorResults.add('LifecycleStartDate does not match with startDate of the first AssetStatePeriod.');
             }
             // Validate LifecycleEndDate should be after LifecycleStartDate 
             if(lifecycleEndDate != null && lifecycleStartDate > lifecycleEndDate) {
@@ -241,10 +241,10 @@ public with sharing class AssetValidatorUtil {
         }
 
         if(lifecycleEndDate != actualEndDate) {
-            errorResults.add('LifecycleEndDate must match with endDate of latest AssetStatePeriod');
+            errorResults.add('LifecycleEndDate must match with endDate of latest AssetStatePeriod.');
         }
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('Asset.LifecycleStartDate and Asset.LifecycleEndDate are valid');
+            ValidationResults.successMessages.add('Asset.LifecycleStartDate and Asset.LifecycleEndDate are valid.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -277,7 +277,7 @@ public with sharing class AssetValidatorUtil {
         }
         
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetstatePeriods Dates and Date formats are valid');
+            ValidationResults.successMessages.add('AssetstatePeriods Dates and Date formats are valid.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -309,7 +309,7 @@ public with sharing class AssetValidatorUtil {
         }
         
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetstatePeriods Dates and Date formats are valid');
+            ValidationResults.successMessages.add('AssetstatePeriods Dates and Date formats are valid.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -406,7 +406,7 @@ public with sharing class AssetValidatorUtil {
             errorResults.add('AssetStatePeriod must have a monthlyRecurringRevenue that is zero or greater. Check ASP Id: ' + mrrViolations);
         }
         if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('Quantity and monthlyRecurringRevenue for all AssetStatePeriods are valid');
+            ValidationResults.successMessages.add('Quantity and monthlyRecurringRevenue for all AssetStatePeriods are valid.');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
