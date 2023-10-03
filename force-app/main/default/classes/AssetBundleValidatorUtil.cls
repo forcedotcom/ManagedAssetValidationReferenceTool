@@ -39,12 +39,12 @@ public with sharing class AssetBundleValidatorUtil {
         if (Schema.sObjectType.AssetRelationship.isAccessible()) {
             givenAssetARRecord = [SELECT Id, assetId, relatedAssetId, assetRole, relatedAssetRole, groupingKey, fromDate, productRelationshipTypeId from assetRelationship WHERE assetId=:assetId OR relatedAssetId=:assetId];
         } else {
-            throw new CustomException('Insufficient access to AssetRelationship entity');
+            throw new CustomException('Cannot access the AssetRelationship entity, check your permissions.');
         }
         
 
         if (givenAssetARRecord.isEmpty()) {
-            ValidationResults.errorMessages.add('This Asset is not part of a bundle');
+            ValidationResults.errorMessages.add('This Asset is not part of a bundle.');
             return;
         }
 
@@ -70,7 +70,7 @@ public with sharing class AssetBundleValidatorUtil {
             if (Schema.sObjectType.AssetRelationship.isAccessible()) {
                 assetToBeQueriedARRecord = [SELECT Id, assetId, relatedAssetId, assetRole, relatedAssetRole, groupingKey, fromDate, productRelationshipTypeId FROM assetRelationship WHERE assetId IN :assetIdToBeQueried OR relatedAssetId IN :assetIdToBeQueried];
             } else {
-                throw new CustomException('Insufficient access to AssetRelationship entity');
+                throw new CustomException('Cannot access the AssetRelationship entity, check your permissions.');
             }
             actualAssetIds.addAll(assetIdToBeQueried);
             assetIdToBeQueried = new Set<String>(); 
@@ -98,7 +98,7 @@ public with sharing class AssetBundleValidatorUtil {
             // Get root asset(s) of the bundle
             rootAssets = [SELECT name, Id FROM Asset WHERE Id IN (SELECT AssetId FROM AssetRelationship WHERE groupingKey = :groupingKey) AND Id NOT IN (SELECT RelatedAssetId FROM AssetRelationship WHERE groupingKey = :groupingKey)];
         } else {
-            throw new CustomException('Insufficient access to Asset entity');
+            throw new CustomException('Cannot access the Asset entity, check your permissions.');
         }
         Set<String> rootAssetIds = new Set<String>();
         for (Asset asset : rootAssets) {
@@ -131,13 +131,13 @@ public with sharing class AssetBundleValidatorUtil {
         String referenceGroupingKey = allAssetRelationships.get(0).groupingKey;
         for (AssetRelationship ar : allAssetRelationships) {
             if (ar.groupingKey == null) {
-                throw new CustomException('This bundle contains a missing groupingKey. Every AssetRelationship record in this bundle must have a groupingKey');
+                throw new CustomException('This bundle contains a missing groupingKey. Every AssetRelationship record in this bundle must have a groupingKey.');
             }
             if (ar.groupingKey != referenceGroupingKey) {
-                throw new CustomException('This bundle contains more than one unique groupingKey. Only one unique groupingKey value can exist for a bundle');
+                throw new CustomException('This bundle contains more than one unique groupingKey. Only one unique groupingKey value can exist for a bundle.');
             }
         }
-        ValidationResults.successMessages.add('All AssetRelationship records share the same groupingKey');
+        ValidationResults.successMessages.add('All AssetRelationship records share the same groupingKey.');
     } 
 
     /**
@@ -189,7 +189,7 @@ public with sharing class AssetBundleValidatorUtil {
         processIdList(incorrectFromDate, 'FromDate');
 
         if (missingAssetRole.isEmpty() && missingRelatedRole.isEmpty() && missingProductRelationshipType.isEmpty() && incorrectFromDate.isEmpty()) {
-            ValidationResults.successMessages.add('All AssetRelationship field validation is successful');
+            ValidationResults.successMessages.add('All AssetRelationship field validations are successful');
         }
 
         if (!multiplePrimaryRelationship.isEmpty()) {
@@ -233,7 +233,7 @@ public with sharing class AssetBundleValidatorUtil {
         if (Schema.sObjectType.AssetRelationship.isAccessible()) {
             assetRelationships = [SELECT relatedAssetId FROM assetRelationship WHERE assetId IN :assetIds];
         }  else {
-            throw new CustomException('Insufficient access to AssetRelationship entity');
+            throw new CustomException('Cannot access the AssetRelationship entity, check your permissions');
         }
 
         for (AssetRelationship ar : assetRelationships) {
@@ -251,7 +251,7 @@ public with sharing class AssetBundleValidatorUtil {
         if (Schema.sObjectType.Asset.isAccessible()) {
             allAssets = [SELECT Id, lifecycleStartDate FROM Asset WHERE Id IN :assetIds];
         } else {
-            throw new CustomException('Insufficient access to Asset entity');
+            throw new CustomException('Cannot access the Asset entity, check your permissions.');
         }
         Map<String, Asset> assetIdToAsset = new Map<String, Asset>();
 

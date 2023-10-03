@@ -20,7 +20,7 @@ public with sharing class AssetValidatorUtil {
                 throw new CustomException('An error occurred while querying the Asset record, please provide valid Asset id');
             }
         } else {
-            throw new CustomException('Insufficient access to Asset entity');
+            throw new CustomException('Cannot access the Asset entity, check your permissions.');
         }
         
         // We will never return null asset, we will always throw exception for null records
@@ -32,10 +32,10 @@ public with sharing class AssetValidatorUtil {
     public static void validateAssetInputFields(Asset asset) {
         List<String> errorResults = new List<String>();
         if(asset.Product2Id == null) {
-            errorResults.add('ProductId is required field, please provide a valid ProductId');
+            errorResults.add('ProductId is required field');
         }
         if(!asset.HasLifecycleManagement) {
-            errorResults.add('Lifecycle-managed asset checkbox should be set to true');
+            errorResults.add('Set the Lifecycle-managed asset checkbox to true.');
         }
         if(errorResults.isEmpty()) {
             ValidationResults.successMessages.add('Assets fields are valid');
@@ -60,24 +60,24 @@ public with sharing class AssetValidatorUtil {
 
         // For future Asset
         if(asps[0].startDate > currentDate && currentLifecycleEndDate != (asps[0].startDate.addSeconds(-1))) {
-            errorResult = 'Assets currentLifecycleEndDate should be 1 second earlier than Asset lifecycle start date i.e. :' + (asps[0].startDate.addSeconds(-1));
+            errorResult = 'The Asset.currentLifecycleEndDate must be 1 second earlier than the Asset.lifecycleStartDate. For example: ' + (asps[0].startDate.addSeconds(-1));
         }
 
         // For past Asset
         if(asps[asps.size()-1].endDate < currentDate && currentLifecycleEndDate != null) {
-            errorResult = 'For expired Assets currentLifecycleEndDate should not be set';  
+            errorResult = 'The Asset.currentLifecycleEndDate must be empty for expired Assets.';  
         }
 
         // For ongoing Asset 
         for(AssetStatePeriod asp : asps) {
             if(asp.startDate <= currentDate && (asp.endDate == null || asp.endDate >= currentDate)) {
                 if(currentLifecycleEndDate != asp.endDate) {
-                    errorResult = 'Assets currentLifecycleEndDate should be same as end date of ongoing ASP Id :' + asp.id;
+                    errorResult = 'The Asset.currentLifecycleEndDate must be same as the end date of the ongoing ASP Id :' + asp.id;
                 }
             }
         }
         if (errorResult == null) {
-            ValidationResults.successMessages.add('Assets currentLifecycleEndDate is valid');
+            ValidationResults.successMessages.add('Asset.currentLifecycleEndDate is valid');
         } else {
             ValidationResults.errorMessages.add(errorResult);
         }
@@ -87,7 +87,7 @@ public with sharing class AssetValidatorUtil {
     public static void validateAssetActionsForCPQPlusOrBilling(List<AssetAction> assetActions) {
         List<String> errorResults = validateAAFields(assetActions);
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetActions are valid for given Asset Id');
+            ValidationResults.successMessages.add('The AssetActions are valid for given Asset Id');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -98,13 +98,13 @@ public with sharing class AssetValidatorUtil {
         List<String> errorResults = new List<String>();
         for(AssetActionSource aas:assetActionSources) {
             if((aas.ExternalReference == null || aas.ExternalReferenceDataSource == null) && aas.ReferenceEntityItemId == null) {
-                errorResults.add('AssetActionSource should have reference for Id:' + aas.Id);
+                errorResults.add('AssetActionSource must have a reference for this Id:' + aas.Id);
             }
         }
         if(assetActionSources.isEmpty()) {
             ValidationResults.successMessages.add('No AssetActionSources available for this Asset');
         } else if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetActionSources are valid for the given Asset Id');
+            ValidationResults.successMessages.add('The AssetActionSources are valid for the given Asset Id');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -125,13 +125,13 @@ public with sharing class AssetValidatorUtil {
         List<String> absentAASViolations = validateAASExistsForAA(assetActions, assetActionSources);
         List<String> invalidReferenceEntityItemIds = validateAASReferenceEntityItem(assetActionSources);
         if (absentAASViolations.size() > 0) {
-            errorResults.add('Each AssetAction should have at least one associated AssetActionSource, found no AssetActionSource for AssetAction(s): ' + absentAASViolations);
+            errorResults.add('Each AssetAction must have at least one associated AssetActionSource: ' + absentAASViolations);
         }
         if (invalidReferenceEntityItemIds.size() > 0) {
-            errorResults.add('AssetActionSource should have a valid ReferenceEntityItemId set, please check AssetActionSource Id(s): ' + invalidReferenceEntityItemIds);
+            errorResults.add('AssetActionSource must have a valid ReferenceEntityItemId. Check the AssetActionSource Id(s):  ' + invalidReferenceEntityItemIds);
         }
         if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetAction(s) and AssetActionSource(s) are valid for the given Asset Id');
+            ValidationResults.successMessages.add('The AssetActions and AssetActionSources are valid for the given Asset Id');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -144,7 +144,7 @@ public with sharing class AssetValidatorUtil {
             totalAmountFromAA += aa.Amount;
         }
         if (totalAmountFromAA != Double.valueOf(asset.totalLifecycleAmount)) {
-            ValidationResults.errorMessages.add('Asset.totalLifecycleAmount doesn\'t match the sum of all associated AssetAction for asset Id: ' + asset.Id);
+            ValidationResults.errorMessages.add('Asset.totalLifecycleAmount doesn\'t match the sum of all associated AssetAction for the asset Id: ' + asset.Id);
         } else {
             ValidationResults.successMessages.add('Asset.totalLifecycleAmount is valid');
         }
@@ -156,10 +156,10 @@ public with sharing class AssetValidatorUtil {
         if (Schema.sObjectType.AssetStatePeriod.isAccessible()) {
             asps = [SELECT Id, startDate, endDate, quantity, mrr FROM AssetStatePeriod WHERE assetId = :assetId ORDER BY StartDate ASC];
         } else {
-            throw new CustomException('Insufficient access to AssetStatePeriod entity');
+            throw new CustomException('Cannot access the AssetStatePeriod entity, check your permissions.');
         }
         if(asps.isEmpty()) {
-            throw new CustomException('Lifecycle Managed Assets must have related AssetStatePeriod Entity');
+            throw new CustomException('Lifecycle Managed Assets must have related a AssetStatePeriod Entity');
         }
         return asps;
     }
@@ -170,7 +170,7 @@ public with sharing class AssetValidatorUtil {
         if (Schema.sObjectType.AssetAction.isAccessible()) {
             assetActions = [SELECT Id, CategoryEnum, ActionDate, Amount FROM AssetAction WHERE assetId = :assetId ORDER BY ActionDate ASC];
         } else {
-            throw new CustomException('Insufficient access to AssetAction entity');
+            throw new CustomException('Cannot access the AssetAction entity, check your permissions.');
         }
         if(assetActions.isEmpty()) {
             throw new CustomException('Lifecycle Managed Assets must have related AssetAction Entity');
@@ -185,7 +185,7 @@ public with sharing class AssetValidatorUtil {
             assetActionSources = [SELECT Id, ReferenceEntityItemId, ExternalReference, ExternalReferenceDataSource, AssetActionId FROM AssetActionSource 
                                  WHERE AssetAction.AssetId = :assetId];
         } else {
-            throw new CustomException('Insufficient access to AssetActionSource entity');
+            throw new CustomException('Cannot access the AssetActionSource entity, check your permissions.');
         }
         return assetActionSources;
     }
@@ -210,12 +210,12 @@ public with sharing class AssetValidatorUtil {
                 }
             }
             if(asp.endDate == null && asp.Id != lastASPId) {
-                throw new CustomException('Error: For Evergreen Assets only last AssetStatePeriods EndDate can be NULL. Please check ASP Id: ' + asp.Id);
+                throw new CustomException('For evergreen assets, only the last AssetStatePeriods EndDate can be NULL. Check the ASP Id: ' + asp.Id);
             }
             previousASP = asp;
         }
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('AssetstatePeriods does not have Gaps or overlaps');
+            ValidationResults.successMessages.add('AssetstatePeriods does not have gaps or overlaps');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -234,17 +234,17 @@ public with sharing class AssetValidatorUtil {
             }
             // Validate LifecycleEndDate should be after LifecycleStartDate 
             if(lifecycleEndDate != null && lifecycleStartDate > lifecycleEndDate) {
-                errorResults.add('lifecycleStartDate should start before LifecycleEndDate. Please check Assets lifecycleStartDate and LifecycleEndDate');
+                errorResults.add('lifecycleStartDate must be before LifecycleEndDate. Check the Asset.lifecycleStartDate and Asset.LifecycleEndDate.');
             }  
         } else {
-            errorResults.add('lifecycleStartDate should not be NULL.');
+            errorResults.add('lifecycleStartDate must not be NULL.');
         }
 
         if(lifecycleEndDate != actualEndDate) {
-            errorResults.add('LifecycleEndDate does not match with endDate of latest AssetStatePeriod');
+            errorResults.add('LifecycleEndDate must match with endDate of latest AssetStatePeriod');
         }
         if(errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('Asset LifecycleStartDate and LifecycleEndDate are valid');
+            ValidationResults.successMessages.add('Asset.LifecycleStartDate and Asset.LifecycleEndDate are valid');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
@@ -259,19 +259,19 @@ public with sharing class AssetValidatorUtil {
             DateTime startDate = asp.StartDate;
             DateTime endDate = asp.EndDate;
             if(startDate.second() != 0) {
-                errorResults.add('AssetStatePeriod startDate time should be 00 second. Please check ASP Id: ' + asp.Id);
+                errorResults.add('AssetStatePeriod startDate time must be 00 second. Check ASP Id: ' + asp.Id);
             }
             // Evergreen ASP does not need these validations
             if(endDate != null) {
                 if(startDate > endDate) {
-                    errorResults.add('AssetStatePeriod startDate should be before endDate. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod startDate must be before endDate. Check ASP Id: ' + asp.Id);
                 }
                 if(endDate.second() != 59) {
-                    errorResults.add('AssetStatePeriod endDate time should be 59 seconds. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod endDate time must be 59 seconds. Check ASP Id: ' + asp.Id);
                 }
                 Long secondsDiff = (endDate.getTime() - startDate.getTime())/1000;
                 if(Math.mod(secondsDiff+1,86400) != 0) {
-                    errorResults.add('AssetStatePeriod must span for multiples of 24 hours. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod must span for multiples of 24 hours. Check ASP Id: ' + asp.Id);
                 }
             } 
         }
@@ -291,19 +291,19 @@ public with sharing class AssetValidatorUtil {
             DateTime startDate = asp.StartDate;
             DateTime endDate = asp.EndDate;
             if (startDate.second() != 0 || startDate.minute() != 0 || startDate.hourGmt() != 0) {
-                errorResults.add('AssetStatePeriod must have a startDate with time formatted as 00:00:00 in UTC. Please check ASP Id: ' + asp.Id);
+                errorResults.add('AssetStatePeriod must have a startDate with the time formatted as 00:00:00 in UTC. Check ASP Id: ' + asp.Id);
             }
             // Validate end date format for non-evergreen ASPs
             if (endDate != null) {
                 if(startDate > endDate) {
-                    errorResults.add('AssetStatePeriod startDate should be before endDate. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod startDate must be before endDate. Check ASP Id: ' + asp.Id);
                 }
                 if (endDate.second() != 59 || asp.endDate.minute() != 59 || asp.endDate.hourGmt() != 23) {
-                    errorResults.add('AssetStatePeriod must have an endDate with time formatted 23:59:59 in UTC. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod must have an endDate with the time formatted 23:59:59 in UTC. Check ASP Id: ' + asp.Id);
                 }
                 Long secondsDiff = (endDate.getTime() - startDate.getTime()) / 1000;
                 if (Math.mod(secondsDiff+1,86400) != 0) {
-                    errorResults.add('AssetStatePeriod must span for multiples of 24 hours. Please check ASP Id: ' + asp.Id);
+                    errorResults.add('AssetStatePeriod must span for multiples of 24 hours. Check ASP Id: ' + asp.Id);
                 }
             } 
         }
@@ -356,7 +356,7 @@ public with sharing class AssetValidatorUtil {
                 System.debug('An error occurred while querying the OrderItem record: ' +  e.getMessage());
             }
         } else {
-            throw new CustomException('Insufficient access to OrderItem entity');
+            throw new CustomException('Cannot access the OrderItem entity, check your permissions.');
         }
 
         // Validate that each referenceEntityItemId is a valid OrderItemId
@@ -375,10 +375,10 @@ public with sharing class AssetValidatorUtil {
         Set<DateTime> seenAssetActionDates = new Set<DateTime>();
         for(AssetAction aa:assetActions) {
             if(aa.CategoryEnum == null) {
-                errorResults.add('AssetAction must have BusinessCategory field populated for Id: ' + aa.Id);
+                errorResults.add('AssetAction must have the BusinessCategory field populated for Id: ' + aa.Id);
             }
             if(previousAssetAction != null && previousAssetAction.ActionDate != null && seenAssetActionDates.contains(aa.ActionDate)) {
-                errorResults.add('AssetAction actionDates should be unique. Please check AssetAction Id: ' + aa.Id);
+                errorResults.add('AssetAction actionDates must be unique. Check AssetAction Id: ' + aa.Id);
             }
             previousAssetAction = aa;
             seenAssetActionDates.add(aa.ActionDate);
@@ -400,13 +400,13 @@ public with sharing class AssetValidatorUtil {
             }
         }
         if (quantityViolations.size() > 0) {
-            errorResults.add('AssetStatePeriod must have a non-negative quantity. Please check ASP Id(s): ' + quantityViolations);
+            errorResults.add('AssetStatePeriod must have a quantity that is zero or greater. Check ASP Id(s): ' + quantityViolations);
         }
         if (mrrViolations.size() > 0) {
-            errorResults.add('AssetStatePeriod must have a non-negative mrr. Please check ASP Id: ' + mrrViolations);
+            errorResults.add('AssetStatePeriod must have a monthlyRecurringRevenue that is zero or greater. Check ASP Id: ' + mrrViolations);
         }
         if (errorResults.isEmpty()) {
-            ValidationResults.successMessages.add('Quantity and mrr for all AssetStatePeriods are valid');
+            ValidationResults.successMessages.add('Quantity and monthlyRecurringRevenue for all AssetStatePeriods are valid');
         } else {
             ValidationResults.errorMessages.addAll(errorResults);
         }
