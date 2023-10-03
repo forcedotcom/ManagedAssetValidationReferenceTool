@@ -2,11 +2,10 @@
 
 <!-- Display an input field for the asset id -->
     <apex:form >
-        <apex:pageBlock title="Check Asset data for compatibility with subsequent lifecycle operations constraints (Not exhaustive)">
+        <apex:pageBlock title="Check your Asset data for compatibility with lifecycle operations constraints. This list is not exhaustive.">
             <apex:inputText value="{!assetId}" html-placeholder="Enter Asset Id"/>
-            <apex:commandButton value="CPQ+ or Billing" action="{!validateAssetForCPQPlusOrBilling}" title="Validate CPQ+ or Billing Assets"/>
             <apex:commandButton value="SubMgmt" action="{!validateAssetForSubMgmt}" title="Validate Subscription Management Assets"/>
-            <apex:commandButton value="SubMgmt Bundled Asset Structure" action="{!validateSubMgmtAssetBundleStructure}" title="Validate Subscription Management bundled Asset structure"/>
+            <apex:commandButton value="SubMgmt Bundled Asset Structure" action="{!validateSubMgmtAssetBundleStructure}" title="Validate Subscription Management bundled asset structure"/>
         </apex:pageBlock>
     </apex:form>
 <!-- Display the validation result as a csv -->
