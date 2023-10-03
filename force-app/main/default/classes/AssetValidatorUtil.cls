@@ -128,7 +128,7 @@ public with sharing class AssetValidatorUtil {
             errorResults.add('Each AssetAction must have at least one associated AssetActionSource: ' + absentAASViolations);
         }
         if (invalidReferenceEntityItemIds.size() > 0) {
-            errorResults.add('AssetActionSource must have a valid ReferenceEntityItemId. Check the AssetActionSource Id(s):  ' + invalidReferenceEntityItemIds);
+            errorResults.add('AssetActionSource must have a valid ReferenceEntityItemId. Check the AssetActionSource Id(s): ' + invalidReferenceEntityItemIds);
         }
         if (errorResults.isEmpty()) {
             ValidationResults.successMessages.add('The AssetActions and AssetActionSources are valid for the given Asset Id.');
@@ -159,7 +159,7 @@ public with sharing class AssetValidatorUtil {
             throw new CustomException('Cannot access the AssetStatePeriod entity, check your permissions.');
         }
         if(asps.isEmpty()) {
-            throw new CustomException('Lifecycle Managed Assets must have related a AssetStatePeriod Entity');
+            throw new CustomException('Lifecycle Managed Assets must have a related AssetStatePeriod Entity');
         }
         return asps;
     }
